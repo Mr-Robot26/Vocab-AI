@@ -96,8 +96,22 @@ def home():
 
 @app.route("/")
 def base():
-    # render the home template
-    return render_template("home.html")
+    # Get the list of preloaded file names
+    preloaded_files = os.listdir("static/pre-loaded")
+    # Format the file names to display as "Call 1", "Call 2", etc.
+    file_names = [f"Call {i + 1}" for i in range(len(preloaded_files))]
+
+    # Get the list of uploaded WAV and Excel files
+    uploaded_wav_files = os.listdir(app.config['STATIC_FOLDER'])
+    uploaded_excel_files = os.listdir(app.config['UPLOAD_FOLDER'])
+
+    return render_template(
+        "home.html",
+        filenames=file_names,
+        uploaded_wav_files=uploaded_wav_files,
+        uploaded_excel_files=uploaded_excel_files
+    )
+
 
 @app.route('/save', methods=['POST','GET'])
 def save():
