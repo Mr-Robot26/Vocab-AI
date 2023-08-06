@@ -24,11 +24,13 @@ for file in files:
 
 
 
-@app.route('/upload', methods=['POST'])
-def upload():
+@app.route("/call_<name>", methods=['POST', 'GET'])
+def sample(name):
+    num = name
     # Retrieve the uploaded files
-    wav_file = request.files['wavfile']
-    excel_file = request.files['excelfile']
+    folder_path = os.path.join(app.config['STATIC_FOLDER'], "pre-loaded", f"Call {num}")
+    
+    
 
     # Do something with the uploaded files
 
@@ -36,19 +38,19 @@ def upload():
     filename = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10)) + '.xlsx'
     
     # Set the path where the Excel file will be saved
-    excel_file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    excel_file_path = os.path.join(folder_path, f"{num}.xlsx")
     
     # Save the Excel file to the specified path
-    excel_file.save(excel_file_path)
+    #excel_file.save(excel_file_path)
 
     # Replace the file extension to '.wav' for the WAV file
     filename = filename.replace(".xlsx", ".wav")
     
     # Set the path where the WAV file will be saved
-    wav_file_path = os.path.join(app.config['STATIC_FOLDER'], 'temp', filename)
+    wav_file_path = os.path.join(folder_path, f"{num}.wav")
     
     # Save the WAV file to the specified path
-    wav_file.save(wav_file_path)
+    #wav_file.save(wav_file_path)
 
     # Store the paths of the uploaded files in the session for later use
     session['excel_file_path'] = excel_file_path
@@ -56,6 +58,8 @@ def upload():
 
     # Redirect the user to the "/render" route
     return redirect("/tool")
+    
+
 
 
 @app.route("/tool", methods=['POST','GET'])
@@ -96,21 +100,11 @@ def home():
 
 @app.route("/")
 def base():
-    # Get the list of preloaded file names
-    preloaded_files = os.listdir("static/pre-loaded")
-    # Format the file names to display as "Call 1", "Call 2", etc.
-    file_names = [f"Call {i + 1}" for i in range(len(preloaded_files))]
-
-    # Get the list of uploaded WAV and Excel files
-    uploaded_wav_files = os.listdir(app.config['STATIC_FOLDER'])
-    uploaded_excel_files = os.listdir(app.config['UPLOAD_FOLDER'])
-
-    return render_template(
-        "home.html",
-        filenames=file_names,
-        uploaded_wav_files=uploaded_wav_files,
-        uploaded_excel_files=uploaded_excel_files
-    )
+    ## get list of preloaded files
+    file_names=os.listdir("static/pre-loaded")
+    for i in range(len(file_names)):
+        file_names[i]="Call "+str(i+1)
+    return render_template("home.html",filenames=file_names)
 
 
 @app.route('/save', methods=['POST','GET'])
@@ -154,7 +148,7 @@ def done():
     excel_file_path = session.get('excel_file_path')
     
     # Send the file as a download to the user
-    return send_file(excel_file_path, download_name="Call.xlsx", as_attachment=True)
+    return send_file(excel_file_path, download_name="Call{num}.xlsx", as_attachment=True)
 
 
 if __name__ == '__main__':
