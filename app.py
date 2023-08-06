@@ -35,7 +35,8 @@ def sample(name):
     # Do something with the uploaded files
 
     # Generate a random filename for the Excel file
-    filename = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10)) + '.xlsx'
+    # filename = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10)) + '.xlsx'
+    filename = f"{num}.xlsx"
     
     # Set the path where the Excel file will be saved
     excel_file_path = os.path.join(folder_path, f"{num}.xlsx")
